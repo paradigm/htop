@@ -83,7 +83,8 @@ typedef enum LinuxProcessFields {
    M_PSS = 119,
    M_SWAP = 120,
    M_PSSWP = 121,
-   LAST_PROCESSFIELD = 122,
+   STRATUM = 122,
+   LAST_PROCESSFIELD = 123,
 } LinuxProcessField;
 
 #include "IOPriority.h"
@@ -141,6 +142,7 @@ typedef struct LinuxProcess_ {
    float blkio_delay_percent;
    float swapin_delay_percent;
    #endif
+   char *stratum;
 } LinuxProcess;
 
 #ifndef Process_isKernelThread

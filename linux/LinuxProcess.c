@@ -92,7 +92,8 @@ typedef enum LinuxProcessFields {
    M_PSS = 119,
    M_SWAP = 120,
    M_PSSWP = 121,
-   LAST_PROCESSFIELD = 122,
+   STRATUM = 122,
+   LAST_PROCESSFIELD = 123,
 } LinuxProcessField;
 
 #include "IOPriority.h"
@@ -150,6 +151,7 @@ typedef struct LinuxProcess_ {
    float blkio_delay_percent;
    float swapin_delay_percent;
    #endif
+   char *stratum;
 } LinuxProcess;
 
 #ifndef Process_isKernelThread
@@ -251,6 +253,7 @@ ProcessFieldData Process_fields[] = {
    [M_PSS] = { .name = "M_PSS", .title = "  PSS ", .description = "proportional set size, same as M_RESIDENT but each page is divided by the number of processes sharing it.", .flags = PROCESS_FLAG_LINUX_SMAPS, },
    [M_SWAP] = { .name = "M_SWAP", .title = " SWAP ", .description = "Size of the process's swapped pages", .flags = PROCESS_FLAG_LINUX_SMAPS, },
    [M_PSSWP] = { .name = "M_PSSWP", .title = " PSSWP ", .description = "shows proportional swap share of this mapping, Unlike \"Swap\", this does not take into account swapped out page of underlying shmem objects.", .flags = PROCESS_FLAG_LINUX_SMAPS, },
+   [STRATUM] = { .name = "STRATUM", .title = " STRATUM ", .description = "Bedrock Linux stratum", .flags = 0, },
    [LAST_PROCESSFIELD] = { .name = "*** report bug! ***", .title = NULL, .description = NULL, .flags = 0, },
 };
 
@@ -291,6 +294,7 @@ void Process_delete(Object* cast) {
    free(this->cgroup);
 #endif
    free(this->ttyDevice);
+   free(this->stratum);
    free(this);
 }
 
@@ -420,6 +424,7 @@ void LinuxProcess_writeField(Process* this, RichString* str, ProcessField field)
    case PERCENT_IO_DELAY: LinuxProcess_printDelay(lp->blkio_delay_percent, buffer, n); break;
    case PERCENT_SWAP_DELAY: LinuxProcess_printDelay(lp->swapin_delay_percent, buffer, n); break;
    #endif
+   case STRATUM: xSnprintf(buffer, n, "%-11s ", lp->stratum); break;
    default:
       Process_writeField((Process*)this, str, field);
       return;

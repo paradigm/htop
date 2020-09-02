@@ -748,6 +748,20 @@ static void LinuxProcessList_readDelayAcctData(LinuxProcessList* this, LinuxProc
 
 #endif
 
+static void LinuxProcessList_readStratum(LinuxProcess* process, const char* dirname, const char* name) {
+   char filename[MAX_NAME+1];
+   xSnprintf(filename, MAX_NAME, "%s/%s/root", dirname, name);
+
+   char buf[MAX_NAME+1];
+   ssize_t r = getxattr(filename, "user.bedrock.stratum", &buf, sizeof(buf)-1);
+   if (r >= 0) {
+       buf[r] = '\0';
+       process->stratum = xStrdup(buf);
+   } else {
+       process->stratum = xStrdup("?");
+   }
+}
+
 static void setCommand(Process* process, const char* command, int len) {
    if (process->comm && process->commLen >= len) {
       strncpy(process->comm, command, len + 1);
@@ -963,6 +977,8 @@ static bool LinuxProcessList_recurseProcTree(LinuxProcessList* this, const char*
             }
          }
       }
+
+      LinuxProcessList_readStratum(lp, dirname, name);
 
       #ifdef HAVE_DELAYACCT
       LinuxProcessList_readDelayAcctData(this, lp);

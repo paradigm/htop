@@ -1,3 +1,28 @@
+Fork of htop-dev which adds a Bedrock Linux stratum column.
+
+To enable the column, hit or select:
+
+- `F2`
+- `Columns`
+- `Available Columns`
+- `STRATUM`
+- `F5`
+- `Active Columns`
+- `STRATUM`
+- `F7`/`F8` as desired
+
+Limitations:
+
+- Seeing the stratum of other user's processes requires root permissions.
+	- `brl which` can avoid this, but the technique it uses is problematically slow for `htop`
+- Even with root permissions this may not detect the stratum of sandboxed processes.
+
+If you're building on Bedrock, don't forget to `strat -r`, e.g.:
+
+	strat -r debian sh -c './autogen.sh && ./configure && make && sudo cp ./htop /usr/local/bin/'
+
+-----
+
 ![htop](https://htop.dev)
 
 [![CI](https://github.com/htop-dev/htop/workflows/CI/badge.svg)](https://github.com/htop-dev/htop/actions)
